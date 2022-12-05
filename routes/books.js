@@ -62,13 +62,15 @@ router.put("/:isbn", async function (req, res, next) {
     const result = jsonschema.validate(req.body, bookSchemaUpdate)
 
     if (!result.valid) {
-      let listOfErrors = result.errors.map(err => err.stack)
-      let err = new ExpressError(listOfErrors, 400)
-      return next(err)
+      return next({
+        status: 400,
+        errors: result.errors.map(err => err.stack)
+      })
     }
 
     const book = await Book.update(req.params.isbn, req.body);
     return res.json({ book });
+
   } catch (err) {
     return next(err);
   }
